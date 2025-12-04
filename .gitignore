@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Build and TypeScript
+*.js
+*.d.ts
+*.tsbuildinfo
+!postcss.config.js
+!tailwind.config.js
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
