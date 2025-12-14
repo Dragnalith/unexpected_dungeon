@@ -1,0 +1,152 @@
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, fontSize, borderRadius, transitions } from '../tokens.stylex'
+
+export const styles = stylex.create({
+  panel: {
+    position: 'relative',
+    flexShrink: 0,
+    height: '100%',
+    backgroundColor: colors.gray800,
+    overflow: 'hidden',
+  },
+  panelWithBorder: {
+    borderLeftWidth: '1px',
+    borderLeftStyle: 'solid',
+    borderLeftColor: colors.gray800,
+  },
+  panelNoBorder: {
+    borderWidth: 0,
+  },
+  inner: {
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+  },
+  header: {
+    paddingLeft: spacing['4'],
+    paddingRight: spacing['4'],
+    paddingTop: spacing['3'],
+    paddingBottom: spacing['3'],
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: colors.gray800,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.gray800,
+  },
+  title: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.gray100,
+  },
+  list: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 0,
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: colors.gray800,
+  },
+  item: {
+    paddingTop: 0,
+    paddingBottom: 0,
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: colors.gray800,
+    ':first-child': {
+      paddingTop: 0,
+    },
+    ':last-child': {
+      paddingBottom: 0,
+    },
+  },
+  itemButton: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing['1'],
+    fontSize: fontSize.sm,
+    color: colors.gray100,
+    backgroundColor: colors.gray900,
+    transition: `background-color ${transitions.fast}`,
+    borderRadius: borderRadius.none,
+    paddingLeft: spacing['1'],
+    paddingRight: spacing['1'],
+    paddingTop: spacing['1'],
+    paddingBottom: spacing['1'],
+    lineHeight: '1.25',
+    ':hover': {
+      backgroundColor: 'rgba(55, 65, 81, 0.7)',
+    },
+  },
+  itemIcon: {
+    fontSize: fontSize.sm,
+    lineHeight: '1.25',
+    flexShrink: 0,
+  },
+  itemId: {
+    fontSize: fontSize.sm,
+    color: colors.gray500,
+    lineHeight: '1.25',
+    flexShrink: 0,
+  },
+  itemName: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    flex: 1,
+    textAlign: 'left',
+    lineHeight: '1.25',
+  },
+  itemExpandIcon: {
+    flexShrink: 0,
+    fontSize: fontSize.sm,
+    color: colors.gray400,
+    lineHeight: '1.25',
+  },
+  itemDetails: {
+    marginTop: spacing['1'],
+    marginLeft: spacing['8'],
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing['1'],
+    fontSize: fontSize.xs,
+    color: colors.gray300,
+  },
+  itemDetailRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing['1'],
+  },
+  itemDetailLabel: {
+    color: colors.gray500,
+  },
+  statusAlive: {
+    color: colors.green400,
+  },
+  statusDead: {
+    color: colors.red400,
+  },
+  statusActive: {
+    color: colors.blue400,
+  },
+  resizeHandle: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    height: '100%',
+    width: '1px',
+    cursor: 'col-resize',
+    backgroundColor: colors.transparent,
+    transition: `background-color ${transitions.fast}`,
+    ':hover': {
+      backgroundColor: 'rgba(55, 65, 81, 0.5)',
+    },
+  },
+})

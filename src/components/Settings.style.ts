@@ -1,0 +1,68 @@
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, fontSize, borderRadius, transitions } from '../tokens.stylex'
+
+export const styles = stylex.create({
+  dropdown: {
+    position: 'absolute',
+    top: spacing['12'],
+    right: spacing['2'],
+    width: '18rem',
+    borderRadius: borderRadius.md,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.gray700,
+    backgroundColor: colors.gray900,
+    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    padding: spacing['4'],
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing['3'],
+    zIndex: 20,
+  },
+  label: {
+    display: 'block',
+    fontSize: fontSize.xs,
+    color: colors.gray400,
+    marginBottom: spacing['1'],
+  },
+  input: {
+    width: '100%',
+    borderRadius: borderRadius.DEFAULT,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.gray700,
+    backgroundColor: colors.gray800,
+    paddingLeft: spacing['2'],
+    paddingRight: spacing['2'],
+    paddingTop: spacing['1'],
+    paddingBottom: spacing['1'],
+    fontSize: fontSize.sm,
+    color: colors.gray100,
+    ':focus': {
+      outline: 'none',
+      boxShadow: `0 0 0 2px ${colors.blue500}`,
+    },
+  },
+  buttonWrapper: {
+    paddingTop: spacing['1'],
+  },
+  closeButton: {
+    width: '100%',
+    borderRadius: borderRadius.DEFAULT,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.gray700,
+    backgroundColor: colors.gray800,
+    paddingLeft: spacing['2'],
+    paddingRight: spacing['2'],
+    paddingTop: spacing['1'],
+    paddingBottom: spacing['1'],
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.gray100,
+    transition: `background-color ${transitions.fast}`,
+    ':hover': {
+      backgroundColor: colors.gray700,
+    },
+  },
+})
