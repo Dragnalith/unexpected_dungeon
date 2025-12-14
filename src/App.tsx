@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, fontSize, borderRadius, transitions } from './tokens.stylex'
 
 type Message = {
   role: 'user' | 'assistant'
@@ -23,11 +25,488 @@ const MOCK_CONTENT: ContentItem[] = [
   { id: 4, type: 'enemy', name: 'Skeleton', position: { x: 3, y: 7 }, status: 'dead' },
 ]
 
-const statusColor: Record<string, string> = {
-  alive: 'text-green-400',
-  dead: 'text-red-400',
-  active: 'text-blue-400',
-}
+const styles = stylex.create({
+  // Layout
+  container: {
+    height: '100vh',
+    overflow: 'hidden',
+    backgroundColor: colors.gray900,
+    color: colors.gray100,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
+  // Header
+  header: {
+    position: 'relative',
+    height: spacing['12'],
+    backgroundColor: colors.gray800,
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: colors.gray700,
+    display: 'flex',
+    alignItems: 'center',
+    paddingLeft: spacing['3'],
+    paddingRight: spacing['3'],
+    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+  },
+  headerLeftSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing['2'],
+  },
+  headerTitle: {
+    position: 'absolute',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.gray50,
+    letterSpacing: '0.025em',
+  },
+  headerRightSection: {
+    marginLeft: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing['2'],
+  },
+
+  // Toggle buttons
+  toggleButton: {
+    position: 'relative',
+    display: 'inline-flex',
+    height: spacing['9'],
+    width: spacing['9'],
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: borderRadius.md,
+    transition: `background-color ${transitions.fast}`,
+    ':hover': {
+      backgroundColor: 'rgba(55, 65, 81, 0.6)',
+    },
+  },
+  toggleButtonOn: {
+    color: colors.gray100,
+  },
+  toggleButtonOff: {
+    color: colors.gray500,
+  },
+  toggleButtonIcon: {
+    fontSize: fontSize.lg,
+  },
+  toggleButtonTooltip: {
+    pointerEvents: 'none',
+    position: 'absolute',
+    bottom: '-2rem',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    whiteSpace: 'nowrap',
+    borderRadius: borderRadius.DEFAULT,
+    backgroundColor: colors.gray700,
+    paddingLeft: spacing['2'],
+    paddingRight: spacing['2'],
+    paddingTop: spacing['1'],
+    paddingBottom: spacing['1'],
+    fontSize: fontSize['10px'],
+    color: colors.gray100,
+    opacity: 0,
+    transition: `opacity ${transitions.fast}`,
+  },
+  toggleButtonTooltipVisible: {
+    ':hover': {
+      opacity: 1,
+    },
+  },
+
+  // Settings dropdown
+  settingsDropdown: {
+    position: 'absolute',
+    top: spacing['12'],
+    right: spacing['2'],
+    width: '18rem',
+    borderRadius: borderRadius.md,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.gray700,
+    backgroundColor: colors.gray900,
+    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    padding: spacing['4'],
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing['3'],
+    zIndex: 20,
+  },
+  settingsLabel: {
+    display: 'block',
+    fontSize: fontSize.xs,
+    color: colors.gray400,
+    marginBottom: spacing['1'],
+  },
+  settingsInput: {
+    width: '100%',
+    borderRadius: borderRadius.DEFAULT,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.gray700,
+    backgroundColor: colors.gray800,
+    paddingLeft: spacing['2'],
+    paddingRight: spacing['2'],
+    paddingTop: spacing['1'],
+    paddingBottom: spacing['1'],
+    fontSize: fontSize.sm,
+    color: colors.gray100,
+    ':focus': {
+      outline: 'none',
+      boxShadow: `0 0 0 2px ${colors.blue500}`,
+    },
+  },
+  settingsButtonWrapper: {
+    paddingTop: spacing['1'],
+  },
+  settingsCloseButton: {
+    width: '100%',
+    borderRadius: borderRadius.DEFAULT,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.gray700,
+    backgroundColor: colors.gray800,
+    paddingLeft: spacing['2'],
+    paddingRight: spacing['2'],
+    paddingTop: spacing['1'],
+    paddingBottom: spacing['1'],
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.gray100,
+    transition: `background-color ${transitions.fast}`,
+    ':hover': {
+      backgroundColor: colors.gray700,
+    },
+  },
+
+  // Main layout
+  main: {
+    display: 'flex',
+    flex: 1,
+    overflow: 'hidden',
+    minWidth: 0,
+  },
+
+  // Left panel (Chat)
+  leftPanel: {
+    position: 'relative',
+    flexShrink: 0,
+    height: '100%',
+    backgroundColor: colors.gray800,
+    overflow: 'hidden',
+  },
+  leftPanelWithBorder: {
+    borderRightWidth: '1px',
+    borderRightStyle: 'solid',
+    borderRightColor: colors.gray800,
+  },
+  leftPanelNoBorder: {
+    borderWidth: 0,
+  },
+  leftPanelInner: {
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+  },
+  leftPanelHeader: {
+    paddingLeft: spacing['4'],
+    paddingRight: spacing['4'],
+    paddingTop: spacing['3'],
+    paddingBottom: spacing['3'],
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: colors.gray800,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.gray800,
+  },
+  leftPanelTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.gray100,
+  },
+  messagesContainer: {
+    flex: 1,
+    overflowY: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing['3'],
+    padding: spacing['4'],
+  },
+  messageRow: {
+    display: 'flex',
+  },
+  messageRowUser: {
+    justifyContent: 'flex-end',
+  },
+  messageRowAssistant: {
+    justifyContent: 'flex-start',
+  },
+  messageBubble: {
+    maxWidth: '80%',
+    borderRadius: borderRadius.lg,
+    paddingLeft: spacing['3'],
+    paddingRight: spacing['3'],
+    paddingTop: spacing['2'],
+    paddingBottom: spacing['2'],
+    fontSize: fontSize.sm,
+    lineHeight: '1.625',
+    transition: `background-color ${transitions.fast}, color ${transitions.fast}`,
+  },
+  messageBubbleUser: {
+    backgroundColor: colors.blue500,
+    color: colors.white,
+  },
+  messageBubbleAssistant: {
+    backgroundColor: colors.gray700,
+    color: colors.gray100,
+  },
+  chatInputContainer: {
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: colors.gray800,
+    padding: spacing['3'],
+    backgroundColor: colors.gray800,
+  },
+  chatInputWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing['2'],
+  },
+  chatTextarea: {
+    flex: 1,
+    resize: 'none',
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.gray900,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.gray700,
+    paddingLeft: spacing['3'],
+    paddingRight: spacing['3'],
+    paddingTop: spacing['2'],
+    paddingBottom: spacing['2'],
+    fontSize: fontSize.sm,
+    color: colors.gray100,
+    transition: `box-shadow ${transitions.fast}`,
+    '::placeholder': {
+      color: colors.gray500,
+    },
+    ':focus': {
+      outline: 'none',
+      boxShadow: `0 0 0 2px ${colors.blue500}`,
+    },
+  },
+  chatSendButton: {
+    height: '100%',
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.blue600,
+    paddingLeft: spacing['4'],
+    paddingRight: spacing['4'],
+    paddingTop: spacing['2'],
+    paddingBottom: spacing['2'],
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.white,
+    boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    transition: `background-color ${transitions.fast}`,
+    ':hover': {
+      backgroundColor: colors.blue500,
+    },
+  },
+  resizeHandle: {
+    position: 'absolute',
+    top: 0,
+    height: '100%',
+    width: '1px',
+    cursor: 'col-resize',
+    backgroundColor: colors.transparent,
+    transition: `background-color ${transitions.fast}`,
+    ':hover': {
+      backgroundColor: 'rgba(55, 65, 81, 0.5)',
+    },
+  },
+  resizeHandleLeft: {
+    right: 0,
+  },
+  resizeHandleRight: {
+    left: 0,
+  },
+
+  // Center panel (Canvas)
+  centerPanel: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    padding: spacing['2'],
+    overflow: 'hidden',
+    minWidth: 0,
+    '@media (min-width: 640px)': {
+      padding: spacing['3'],
+    },
+  },
+  canvasWrapper: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  canvas: {
+    aspectRatio: '4 / 3',
+    width: '100%',
+    height: '100%',
+    maxWidth: '100%',
+    maxHeight: '100%',
+    backgroundColor: colors.gray950,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: colors.gray300,
+    fontSize: fontSize.lg,
+  },
+
+  // Right panel (Content)
+  rightPanel: {
+    position: 'relative',
+    flexShrink: 0,
+    height: '100%',
+    backgroundColor: colors.gray800,
+    overflow: 'hidden',
+  },
+  rightPanelWithBorder: {
+    borderLeftWidth: '1px',
+    borderLeftStyle: 'solid',
+    borderLeftColor: colors.gray800,
+  },
+  rightPanelNoBorder: {
+    borderWidth: 0,
+  },
+  rightPanelInner: {
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+  },
+  rightPanelHeader: {
+    paddingLeft: spacing['4'],
+    paddingRight: spacing['4'],
+    paddingTop: spacing['3'],
+    paddingBottom: spacing['3'],
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: colors.gray800,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.gray800,
+  },
+  rightPanelTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.gray100,
+  },
+  contentList: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 0,
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: colors.gray800,
+  },
+
+  contentItem: {
+    paddingTop: 0,
+    paddingBottom: 0,
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: colors.gray800,
+    ':first-child': {
+      paddingTop: 0,
+    },
+    ':last-child': {
+      paddingBottom: 0,
+    },
+  },
+  contentItemButton: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing['1'],
+    fontSize: fontSize.sm,
+    color: colors.gray100,
+    backgroundColor: colors.gray900,
+    transition: `background-color ${transitions.fast}`,
+    borderRadius: '0',
+    paddingLeft: spacing['1'],
+    paddingRight: spacing['1'],
+    paddingTop: spacing['1'],
+    paddingBottom: spacing['1'],
+    lineHeight: '1.25',
+    ':hover': {
+      backgroundColor: 'rgba(55, 65, 81, 0.7)',
+    },
+  },
+  contentItemIcon: {
+    fontSize: fontSize.sm,
+    lineHeight: '1.25',
+    flexShrink: 0,
+  },
+  contentItemId: {
+    fontSize: fontSize.sm,
+    color: colors.gray500,
+    lineHeight: '1.25',
+    flexShrink: 0,
+  },
+  contentItemName: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    flex: 1,
+    textAlign: 'left',
+    lineHeight: '1.25',
+  },
+  contentItemExpandIcon: {
+    flexShrink: 0,
+    fontSize: fontSize.sm,
+    color: colors.gray400,
+    lineHeight: '1.25',
+  },
+  contentItemDetails: {
+    marginTop: spacing['1'],
+    marginLeft: spacing['8'],
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing['1'],
+    fontSize: fontSize.xs,
+    color: colors.gray300,
+  },
+  contentItemDetailRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing['1'],
+  },
+  contentItemDetailLabel: {
+    color: colors.gray500,
+  },
+  statusAlive: {
+    color: colors.green400,
+  },
+  statusDead: {
+    color: colors.red400,
+  },
+  statusActive: {
+    color: colors.blue400,
+  },
+})
 
 function App() {
   const [showLeft, setShowLeft] = useState(true)
@@ -39,10 +518,12 @@ function App() {
   const [expandedIds, setExpandedIds] = useState<number[]>([])
   const [showSettings, setShowSettings] = useState(false)
 
-  const toggleButtonClass = (isOn: boolean) =>
-    `group relative inline-flex h-9 w-9 items-center justify-center rounded-md transition hover:bg-gray-700/60 ${
-      isOn ? 'text-gray-100' : 'text-gray-500'
-    }`
+  const getStatusStyle = (status: string) => {
+    if (status === 'alive') return styles.statusAlive
+    if (status === 'dead') return styles.statusDead
+    if (status === 'active') return styles.statusActive
+    return null
+  }
 
   const getIcon = (item: ContentItem) => {
     if (item.type === 'enemy') return '💀'
@@ -76,66 +557,74 @@ function App() {
   }, [dragging])
 
   return (
-    <div className="h-screen overflow-hidden bg-gray-900 text-gray-100 flex flex-col">
-      <header className="relative h-12 bg-gray-800 border-b border-gray-700 flex items-center px-3 shadow-md">
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowLeft((prev) => !prev)} className={toggleButtonClass(showLeft)} aria-label="Toggle chat panel">
-            <span className="text-lg">◧</span>
-            <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-[10px] text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
+    <div {...stylex.props(styles.container)}>
+      <header {...stylex.props(styles.header)}>
+        <div {...stylex.props(styles.headerLeftSection)}>
+          <button
+            onClick={() => setShowLeft((prev) => !prev)}
+            {...stylex.props(styles.toggleButton, showLeft ? styles.toggleButtonOn : styles.toggleButtonOff)}
+            aria-label="Toggle chat panel"
+          >
+            <span {...stylex.props(styles.toggleButtonIcon)}>◧</span>
+            <span {...stylex.props(styles.toggleButtonTooltip, styles.toggleButtonTooltipVisible)}>
               {showLeft ? 'Chat On' : 'Chat Off'}
             </span>
           </button>
         </div>
 
-        <h1 className="absolute left-1/2 -translate-x-1/2 text-sm font-semibold text-gray-50 tracking-wide">Unexpected Dungeon</h1>
+        <h1 {...stylex.props(styles.headerTitle)}>Unexpected Dungeon</h1>
 
-        <div className="ml-auto flex items-center gap-2">
-          <button onClick={() => setShowRight((prev) => !prev)} className={toggleButtonClass(showRight)} aria-label="Toggle content panel">
-            <span className="text-lg">◨</span>
-            <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-[10px] text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
+        <div {...stylex.props(styles.headerRightSection)}>
+          <button
+            onClick={() => setShowRight((prev) => !prev)}
+            {...stylex.props(styles.toggleButton, showRight ? styles.toggleButtonOn : styles.toggleButtonOff)}
+            aria-label="Toggle content panel"
+          >
+            <span {...stylex.props(styles.toggleButtonIcon)}>◨</span>
+            <span {...stylex.props(styles.toggleButtonTooltip, styles.toggleButtonTooltipVisible)}>
               {showRight ? 'Content On' : 'Content Off'}
             </span>
           </button>
           <button
             onClick={() => setShowSettings((prev) => !prev)}
-            className={toggleButtonClass(showSettings)}
+            {...stylex.props(styles.toggleButton, showSettings ? styles.toggleButtonOn : styles.toggleButtonOff)}
             aria-label="Open settings"
           >
-            <span className="text-lg">⚙</span>
-            <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-[10px] text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
+            <span {...stylex.props(styles.toggleButtonIcon)}>⚙</span>
+            <span {...stylex.props(styles.toggleButtonTooltip, styles.toggleButtonTooltipVisible)}>
               Settings
             </span>
           </button>
         </div>
 
         {showSettings && (
-          <div className="absolute top-12 right-2 w-72 rounded-md border border-gray-700 bg-gray-900 shadow-lg p-4 space-y-3 z-20">
+          <div {...stylex.props(styles.settingsDropdown)}>
             <div>
-              <label className="block text-xs text-gray-400 mb-1" htmlFor="api-url">
+              <label {...stylex.props(styles.settingsLabel)} htmlFor="api-url">
                 API URL
               </label>
               <input
                 id="api-url"
                 type="text"
-                className="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...stylex.props(styles.settingsInput)}
                 placeholder="https://api.example.com"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1" htmlFor="api-key">
+              <label {...stylex.props(styles.settingsLabel)} htmlFor="api-key">
                 API KEY
               </label>
               <input
                 id="api-key"
                 type="text"
-                className="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...stylex.props(styles.settingsInput)}
                 placeholder="sk-..."
               />
             </div>
-            <div className="pt-1">
+            <div {...stylex.props(styles.settingsButtonWrapper)}>
               <button
                 onClick={() => setShowSettings(false)}
-                className="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1 text-sm font-semibold text-gray-100 hover:bg-gray-700 transition"
+                {...stylex.props(styles.settingsCloseButton)}
               >
                 Close
               </button>
@@ -144,39 +633,35 @@ function App() {
         )}
       </header>
 
-      <main ref={mainRef} className="flex flex-1 overflow-hidden min-w-0">
+      <main ref={mainRef} {...stylex.props(styles.main)}>
         <section
-          className={`relative flex-shrink-0 h-full bg-gray-800 overflow-hidden ${
-            showLeft ? 'border-r border-gray-800' : 'border-0'
-          }`}
+          {...stylex.props(styles.leftPanel, showLeft ? styles.leftPanelWithBorder : styles.leftPanelNoBorder)}
           style={{ width: showLeft ? `${leftWidth}%` : 0 }}
         >
-          <div className="flex h-full flex-col">
-            <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between bg-gray-800">
-              <p className="text-sm font-semibold text-gray-100">AI Chat</p>
+          <div {...stylex.props(styles.leftPanelInner)}>
+            <div {...stylex.props(styles.leftPanelHeader)}>
+              <p {...stylex.props(styles.leftPanelTitle)}>AI Chat</p>
             </div>
-            <div className="flex-1 overflow-y-auto space-y-3 p-4">
+            <div {...stylex.props(styles.messagesContainer)}>
               {MOCK_MESSAGES.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={idx} {...stylex.props(styles.messageRow, msg.role === 'user' ? styles.messageRowUser : styles.messageRowAssistant)}>
                   <div
-                    className={`max-w-[80%] rounded-lg px-3 py-2 text-sm leading-relaxed transition-colors duration-200 ${
-                      msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-gray-100'
-                    }`}
+                    {...stylex.props(styles.messageBubble, msg.role === 'user' ? styles.messageBubbleUser : styles.messageBubbleAssistant)}
                   >
                     {msg.content}
                   </div>
                 </div>
               ))}
             </div>
-            <div className="border-t border-gray-800 p-3 bg-gray-800">
-              <div className="flex items-center gap-2">
+            <div {...stylex.props(styles.chatInputContainer)}>
+              <div {...stylex.props(styles.chatInputWrapper)}>
                 <textarea
-                  className="flex-1 resize-none rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  {...stylex.props(styles.chatTextarea)}
                   placeholder="Type a message..."
                   rows={2}
                   disabled
                 />
-                <button className="h-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-500 transition">
+                <button {...stylex.props(styles.chatSendButton)}>
                   Send
                 </button>
               </div>
@@ -184,63 +669,59 @@ function App() {
           </div>
           {showLeft && (
             <div
-              className="absolute top-0 right-0 h-full w-1 cursor-col-resize bg-transparent hover:bg-gray-700/50 transition"
+              {...stylex.props(styles.resizeHandle, styles.resizeHandleLeft)}
               onMouseDown={() => setDragging('left')}
               aria-label="Resize left panel"
             />
           )}
         </section>
 
-        <section className="flex-1 flex flex-col p-2 sm:p-3 overflow-hidden min-w-0">
-          <div className="flex-1 flex items-center justify-center overflow-hidden">
-            <div
-              className="aspect-[4/3] w-full h-full max-w-full max-h-full bg-gray-950 flex items-center justify-center text-gray-300 text-lg"
-            >
+        <section {...stylex.props(styles.centerPanel)}>
+          <div {...stylex.props(styles.canvasWrapper)}>
+            <div {...stylex.props(styles.canvas)}>
               Game Canvas
             </div>
           </div>
         </section>
 
         <section
-          className={`relative flex-shrink-0 h-full bg-gray-800 overflow-hidden ${
-            showRight ? 'border-l border-gray-800' : 'border-0'
-          }`}
+          {...stylex.props(styles.rightPanel, showRight ? styles.rightPanelWithBorder : styles.rightPanelNoBorder)}
           style={{ width: showRight ? `${rightWidth}%` : 0 }}
         >
-          <div className="flex h-full flex-col">
-            <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between bg-gray-800">
-              <p className="text-sm font-semibold text-gray-100">Content</p>
+          <div {...stylex.props(styles.rightPanelInner)}>
+            <div {...stylex.props(styles.rightPanelHeader)}>
+              <p {...stylex.props(styles.rightPanelTitle)}>Content</p>
             </div>
-            <div className="flex-1 overflow-y-auto p-0 space-y-0 divide-y divide-gray-800">
+            <div {...stylex.props(styles.contentList)}>
               {MOCK_CONTENT.map((item) => (
-                <div key={item.id} className="py-0 first:pt-0 last:pb-0">
+                <div key={item.id} {...stylex.props(styles.contentItem)}>
                   <button
                     onClick={() =>
                       setExpandedIds((prev) =>
                         prev.includes(item.id) ? prev.filter((id) => id !== item.id) : [...prev, item.id],
                       )
                     }
-                    className="w-full flex items-center gap-1 text-sm text-gray-100 bg-gray-900 hover:bg-gray-700/70 transition rounded-none px-1 py-1 leading-tight"
+                    {...stylex.props(styles.contentItemButton)}
                     aria-expanded={expandedIds.includes(item.id)}
                   >
-                    <span className="text-sm leading-tight shrink-0">{getIcon(item)}</span>
-                    <span className="text-sm text-gray-500 leading-tight shrink-0">{item.id}</span>
-                    <span className="text-sm font-semibold truncate flex-1 text-left leading-tight">{item.name}</span>
-                    <span className="shrink-0 text-sm text-gray-400 leading-tight">{expandedIds.includes(item.id) ? '▾' : '▸'}</span>
+                    <span {...stylex.props(styles.contentItemIcon)}>{getIcon(item)}</span>
+                    <span {...stylex.props(styles.contentItemId)}>{item.id}</span>
+                    <span {...stylex.props(styles.contentItemName)}>{item.name}</span>
+                    <span {...stylex.props(styles.contentItemExpandIcon)}>{expandedIds.includes(item.id) ? '▾' : '▸'}</span>
                   </button>
 
                   {expandedIds.includes(item.id) && (
-                    <div className="mt-1 ml-8 space-y-1 text-xs text-gray-300">
+                    <div {...stylex.props(styles.contentItemDetails)}>
                       {'position' in item && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-gray-500">position:</span>
+                        <div {...stylex.props(styles.contentItemDetailRow)}>
+                          <span {...stylex.props(styles.contentItemDetailLabel)}>position:</span>
                           <span>@ ({item.position.x},{item.position.y})</span>
                         </div>
                       )}
                       {'status' in item && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-gray-500">status:</span>
-                          <span className={statusColor[item.status] ?? 'text-gray-300'}>{item.status}</span>
+                        <div {...stylex.props(styles.contentItemDetailRow)}>
+                          <span {...stylex.props(styles.contentItemDetailLabel)}>status:</span>
+                          <span {...stylex.props(getStatusStyle(item.status))}>{item.status}</span>
                         </div>
                       )}
                     </div>
@@ -251,7 +732,7 @@ function App() {
           </div>
           {showRight && (
             <div
-              className="absolute top-0 left-0 h-full w-1 cursor-col-resize bg-transparent hover:bg-gray-700/50 transition"
+              {...stylex.props(styles.resizeHandle, styles.resizeHandleRight)}
               onMouseDown={() => setDragging('right')}
               aria-label="Resize right panel"
             />
