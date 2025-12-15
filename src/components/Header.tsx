@@ -6,6 +6,12 @@ type HeaderProps = {
   showLeft: boolean
   showRight: boolean
   showSettings: boolean
+  apiKey: string
+  setApiKey: (key: string) => void
+  apiUrl: string
+  setApiUrl: (url: string) => void
+  modelName: string
+  setModelName: (model: string) => void
   onToggleLeft: () => void
   onToggleRight: () => void
   onToggleSettings: () => void
@@ -15,6 +21,12 @@ export function Header({
   showLeft,
   showRight,
   showSettings,
+  apiKey,
+  setApiKey,
+  apiUrl,
+  setApiUrl,
+  modelName,
+  setModelName,
   onToggleLeft,
   onToggleRight,
   onToggleSettings,
@@ -59,7 +71,17 @@ export function Header({
         </button>
       </div>
 
-      {showSettings && <Settings onClose={onToggleSettings} />}
+      {showSettings && (
+        <Settings
+          apiKey={apiKey}
+          setApiKey={setApiKey}
+          apiUrl={apiUrl}
+          setApiUrl={setApiUrl}
+          modelName={modelName}
+          setModelName={setModelName}
+          onClose={onToggleSettings}
+        />
+      )}
     </header>
   )
 }
