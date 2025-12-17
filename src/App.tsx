@@ -6,24 +6,13 @@ import { Chat } from './components/Chat'
 import { Inspector } from './components/Inspector'
 import { GameCanvas } from './components/GameCanvas'
 import { SYSTEM_PROMPT } from './config'
+import type { GameState } from './game/types'
+import { createInitialGameState } from './game/state'
 
 type Message = {
   role: 'user' | 'assistant' | 'system' | 'error'
   content: string
 }
-
-type ContentItem =
-  | { id: number; type: 'enemy' | 'npc'; name: string; position: { x: number; y: number }; status: string }
-  | { id: number; type: 'item'; name: string; description: string }
-
-
-
-const MOCK_CONTENT: ContentItem[] = [
-  { id: 1, type: 'enemy', name: 'Goblin', position: { x: 5, y: 5 }, status: 'alive' },
-  { id: 2, type: 'npc', name: 'Mayor', position: { x: 8, y: 8 }, status: 'active' },
-  { id: 3, type: 'item', name: 'Rusty Key', description: 'An old key that might open something' },
-  { id: 4, type: 'enemy', name: 'Skeleton', position: { x: 3, y: 7 }, status: 'dead' },
-]
 
 function App() {
   const [showLeft, setShowLeft] = useState(true)
@@ -38,6 +27,7 @@ function App() {
   const [modelName, setModelName] = useState('anthropic/claude-sonnet-4.5')
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [gameState, setGameState] = useState<GameState>(createInitialGameState)
 
   const handleSendMessage = async (content: string) => {
     const newMessage: Message = { role: 'user', content }
@@ -161,10 +151,13 @@ function App() {
           onResetChat={handleResetChat}
         />
 
-        <GameCanvas />
+        <GameCanvas
+          gameState={gameState}
+          onGameStateChange={setGameState}
+        />
 
         <Inspector
-          items={MOCK_CONTENT}
+          gameState={gameState}
           width={rightWidth}
           visible={showRight}
           onStartResize={() => setDragging('right')}

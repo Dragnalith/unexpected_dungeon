@@ -56,3 +56,4 @@ indent_size = 2
 [*.{bat,cmd,ps1,sln}]
 end_of_line = crlf
 
+

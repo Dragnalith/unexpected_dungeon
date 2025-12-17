@@ -90,6 +90,7 @@ export const styles = stylex.create({
     fontSize: fontSize.xs,
     marginLeft: spacing['8'],
     marginTop: spacing['1'],
+    paddingBottom: spacing['2'],
   },
   itemDetailRow: {
     gap: spacing['1'],
@@ -101,6 +102,7 @@ export const styles = stylex.create({
   },
   itemButton: {
     borderRadius: borderRadius.none,
+    borderWidth: 0,
     gap: spacing['1'],
     transition: `background-color ${transitions.fast}`,
     alignItems: 'center',
@@ -109,6 +111,7 @@ export const styles = stylex.create({
       ':hover': 'rgba(55, 65, 81, 0.7)',
     },
     color: colors.gray100,
+    cursor: 'pointer',
     display: 'flex',
     fontSize: fontSize.sm,
     lineHeight: 1.25,
@@ -148,5 +151,19 @@ export const styles = stylex.create({
     paddingLeft: spacing['4'],
     paddingRight: spacing['4'],
     paddingTop: spacing['3'],
+  },
+  subItem: {
+    gap: spacing['1'],
+    alignItems: 'center',
+    display: 'flex',
+    marginLeft: spacing['2'],
+  },
+  subItemIcon: {
+    color: colors.gray500,
+    fontSize: fontSize.xs,
+  },
+  subItemName: {
+    color: colors.gray400,
+    fontSize: fontSize.xs,
   },
 })

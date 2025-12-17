@@ -1,39 +1,25 @@
 import { useState } from 'react'
 import * as stylex from '@stylexjs/stylex'
 import { styles } from './Inspector.style'
-
-type ContentItem =
-  | { id: number; type: 'enemy' | 'npc'; name: string; position: { x: number; y: number }; status: string }
-  | { id: number; type: 'item'; name: string; description: string }
+import type { GameState } from '../game/types'
 
 type InspectorProps = {
-  items: ContentItem[]
+  gameState: GameState
   width: number
   visible: boolean
   onStartResize: () => void
 }
 
-function getStatusStyle(status: string) {
-  if (status === 'alive') return styles.statusAlive
-  if (status === 'dead') return styles.statusDead
-  if (status === 'active') return styles.statusActive
-  return null
-}
+export function Inspector({ gameState, width, visible, onStartResize }: InspectorProps) {
+  const [expandedIds, setExpandedIds] = useState<string[]>(['player'])
 
-function getIcon(item: ContentItem) {
-  if (item.type === 'enemy') return '💀'
-  if (item.type === 'npc') return '🧑'
-  return '🔑'
-}
-
-export function Inspector({ items, width, visible, onStartResize }: InspectorProps) {
-  const [expandedIds, setExpandedIds] = useState<number[]>([])
-
-  const toggleExpanded = (id: number) => {
+  const toggleExpanded = (id: string) => {
     setExpandedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     )
   }
+
+  const { player, npcs } = gameState
 
   return (
     <section
@@ -45,37 +31,71 @@ export function Inspector({ items, width, visible, onStartResize }: InspectorPro
           <p {...stylex.props(styles.title)}>Inspector</p>
         </div>
         <div {...stylex.props(styles.list)}>
-          {items.map((item) => (
-            <div key={item.id} {...stylex.props(styles.item)}>
+          {/* Player Section */}
+          <div {...stylex.props(styles.item)}>
+            <button
+              onClick={() => toggleExpanded('player')}
+              {...stylex.props(styles.itemButton)}
+              aria-expanded={expandedIds.includes('player')}
+            >
+              <span {...stylex.props(styles.itemIcon)}>🎮</span>
+              <span {...stylex.props(styles.itemName)}>Player</span>
+              <span {...stylex.props(styles.itemExpandIcon)}>
+                {expandedIds.includes('player') ? '▾' : '▸'}
+              </span>
+            </button>
+
+            {expandedIds.includes('player') && (
+              <div {...stylex.props(styles.itemDetails)}>
+                <div {...stylex.props(styles.itemDetailRow)}>
+                  <span {...stylex.props(styles.itemDetailLabel)}>position:</span>
+                  <span>({player.position.x}, {player.position.y})</span>
+                </div>
+                <div {...stylex.props(styles.itemDetailRow)}>
+                  <span {...stylex.props(styles.itemDetailLabel)}>inventory:</span>
+                  <span>{player.inventory.items.length} item(s)</span>
+                </div>
+                {player.inventory.items.map((item) => (
+                  <div key={item.id} {...stylex.props(styles.subItem)}>
+                    <span {...stylex.props(styles.subItemIcon)}>📦</span>
+                    <span {...stylex.props(styles.subItemName)}>{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* NPCs Section */}
+          {npcs.map((npc) => (
+            <div key={npc.id} {...stylex.props(styles.item)}>
               <button
-                onClick={() => toggleExpanded(item.id)}
+                onClick={() => toggleExpanded(npc.id)}
                 {...stylex.props(styles.itemButton)}
-                aria-expanded={expandedIds.includes(item.id)}
+                aria-expanded={expandedIds.includes(npc.id)}
               >
-                <span {...stylex.props(styles.itemIcon)}>{getIcon(item)}</span>
-                <span {...stylex.props(styles.itemId)}>{item.id}</span>
-                <span {...stylex.props(styles.itemName)}>{item.name}</span>
+                <span {...stylex.props(styles.itemIcon)}>🧑</span>
+                <span {...stylex.props(styles.itemName)}>{npc.name}</span>
                 <span {...stylex.props(styles.itemExpandIcon)}>
-                  {expandedIds.includes(item.id) ? '▾' : '▸'}
+                  {expandedIds.includes(npc.id) ? '▾' : '▸'}
                 </span>
               </button>
 
-              {expandedIds.includes(item.id) && (
+              {expandedIds.includes(npc.id) && (
                 <div {...stylex.props(styles.itemDetails)}>
-                  {'position' in item && (
-                    <div {...stylex.props(styles.itemDetailRow)}>
-                      <span {...stylex.props(styles.itemDetailLabel)}>position:</span>
-                      <span>
-                        @ ({item.position.x},{item.position.y})
-                      </span>
+                  <div {...stylex.props(styles.itemDetailRow)}>
+                    <span {...stylex.props(styles.itemDetailLabel)}>position:</span>
+                    <span>({npc.position.x}, {npc.position.y})</span>
+                  </div>
+                  <div {...stylex.props(styles.itemDetailRow)}>
+                    <span {...stylex.props(styles.itemDetailLabel)}>inventory:</span>
+                    <span>{npc.inventory.items.length} item(s)</span>
+                  </div>
+                  {npc.inventory.items.map((item) => (
+                    <div key={item.id} {...stylex.props(styles.subItem)}>
+                      <span {...stylex.props(styles.subItemIcon)}>📦</span>
+                      <span {...stylex.props(styles.subItemName)}>{item.name}</span>
                     </div>
-                  )}
-                  {'status' in item && (
-                    <div {...stylex.props(styles.itemDetailRow)}>
-                      <span {...stylex.props(styles.itemDetailLabel)}>status:</span>
-                      <span {...stylex.props(getStatusStyle(item.status))}>{item.status}</span>
-                    </div>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
